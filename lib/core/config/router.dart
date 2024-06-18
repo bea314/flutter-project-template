@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:panel_administrativo/modules/views/home/home.dart';
@@ -7,29 +8,38 @@ import 'package:panel_administrativo/modules/views/template/template.dart';
 final _routerKey = GlobalKey<NavigatorState>();
 // final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
-// final routerProvider = Provider<GoRouter>((ref) {});
+final routeInformationProvider =
+    ChangeNotifierProvider<GoRouteInformationProvider>((ref) {
+  final router = ref.watch(routerProvider);
+  return router.routeInformationProvider;
+});
 
-final GoRouter router = GoRouter(
-  navigatorKey: _routerKey,
-  // initialLocation: '/login',
-  routes: <GoRoute>[
-    GoRoute(
-      path: '/',
-      name: 'home',
-      builder: (BuildContext context, GoRouterState state) =>
-          const HomeScreen(),
-    ),
-    GoRoute(
-      path: '/login',
-      name: 'login',
-      builder: (BuildContext context, GoRouterState state) =>
-          const TemplateScreen(),
-    ),
-  ],
-  redirect: _guard,
-  // refreshListenable: _auth,
-  debugLogDiagnostics: true,
-);
+final routerProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
+    navigatorKey: _routerKey,
+    // initialLocation: '/login',
+    routes: <GoRoute>[
+      GoRoute(
+        path: '/',
+        name: 'home',
+        builder: (BuildContext context, GoRouterState state) =>
+            const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (BuildContext context, GoRouterState state) =>
+            const TemplateScreen(),
+      ),
+    ],
+    redirect: _guard,
+    // refreshListenable: _auth,
+    debugLogDiagnostics: true,
+  );
+});
+
+// TODO: IMPROVE _guard AND implemeta refreshListenable: _auth
+// TODO: INSERT VALIDATE USER AND SECRET STORAGE
 
 String? _guard(BuildContext context, GoRouterState state) {
   final bool signedIn = false;
@@ -37,7 +47,7 @@ String? _guard(BuildContext context, GoRouterState state) {
 
   // Go to /signin if the user is not signed in
   if (!signedIn && !signingIn) {
-    return '/signin';
+    return '/login';
   }
   // Go to /books if the user is signed in and tries to go to /signin.
   else if (signedIn && signingIn) {
