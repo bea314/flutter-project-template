@@ -5,8 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:panel_administrativo/modules/views/home/home.dart';
 import 'package:panel_administrativo/modules/views/template/template.dart';
 
+import '../../modules/layouts/layouts.dart';
+
 final _routerKey = GlobalKey<NavigatorState>();
-// final _shellNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final routeInformationProvider =
     ChangeNotifierProvider<GoRouteInformationProvider>((ref) {
@@ -18,12 +20,20 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: _routerKey,
     // initialLocation: '/login',
-    routes: <GoRoute>[
-      GoRoute(
-        path: '/',
-        name: 'home',
-        builder: (BuildContext context, GoRouterState state) =>
-            const HomeScreen(),
+    routes: [
+      ShellRoute(
+        navigatorKey: _shellNavigatorKey,
+        builder: (context, state, child) => SystemLayout(
+          child: child,
+        ),
+        routes: [
+          GoRoute(
+            path: '/',
+            name: 'home',
+            builder: (BuildContext context, GoRouterState state) =>
+                const HomeScreen(),
+          ),
+        ]
       ),
       GoRoute(
         path: '/login',
@@ -42,8 +52,8 @@ final routerProvider = Provider<GoRouter>((ref) {
 // TODO: INSERT VALIDATE USER AND SECRET STORAGE
 
 String? _guard(BuildContext context, GoRouterState state) {
-  final bool signedIn = false;
-  final bool signingIn = state.matchedLocation == '/signin';
+  final bool signedIn = true;
+  final bool signingIn = state.matchedLocation == '/login';
 
   // Go to /signin if the user is not signed in
   if (!signedIn && !signingIn) {
