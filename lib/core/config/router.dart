@@ -3,12 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:panel_administrativo/modules/views/home/home.dart';
-import 'package:panel_administrativo/modules/views/template/template.dart';
 
 import '../../modules/layouts/layouts.dart';
+import '../../modules/views/auth/auth.dart';
 
 final _routerKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
+// TODO: SYSTEM SCAFFOLD KEY INTO PROVIDER OR PRESERVE THE STATE
 
 final routeInformationProvider =
     ChangeNotifierProvider<GoRouteInformationProvider>((ref) {
@@ -39,7 +40,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/login',
         name: 'login',
         builder: (BuildContext context, GoRouterState state) =>
-            const TemplateScreen(),
+            const InitLayout(child: LoginView()),
       ),
     ],
     redirect: _guard,
@@ -52,7 +53,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 // TODO: INSERT VALIDATE USER AND SECRET STORAGE
 
 String? _guard(BuildContext context, GoRouterState state) {
-  final bool signedIn = true;
+  final bool signedIn = false;
   final bool signingIn = state.matchedLocation == '/login';
 
   // Go to /signin if the user is not signed in

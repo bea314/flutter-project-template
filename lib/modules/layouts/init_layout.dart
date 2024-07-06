@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class SystemLayout extends StatelessWidget {
-  const SystemLayout({
+class InitLayout extends StatelessWidget {
+  const InitLayout({
     Key? key,
     required this.child
-  }) : super(key: key ?? const ValueKey('SystemLayoutKey'));
+  }) : super(key: key ?? const ValueKey('InitLayoutKey'));
 
   final Widget child;
 

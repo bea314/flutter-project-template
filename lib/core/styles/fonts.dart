@@ -1,5 +1,8 @@
+class SystemFonts {
 
-const titleFont = 'Visby';
-const paragraphFont = 'Montserrat';
+  static const titleFont = 'Visby';
+  static const paragraphFont = 'Montserrat';
+
+}
 
 //TODO: TextStyles?
