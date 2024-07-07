@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -12,7 +11,7 @@ class WidgetFormInputTextField extends StatefulWidget {
     this.hintText,
     this.isPassword = false,
     required this.isRequired,
-    this.keyboardType = TextInputType.none,
+    this.keyboardType = TextInputType.text,
     this.cursorColor,
     this.onChange,
     this.onFieldSubmitted,
@@ -26,7 +25,7 @@ class WidgetFormInputTextField extends StatefulWidget {
     this.floatingLabelBehavior = FloatingLabelBehavior.always,
     this.inputFormatters,
     this.validations,
-    this.maxLines,
+    this.maxLines = 1,
     this.focusChange,
     this.showLabelOutside = false,
   });
@@ -38,7 +37,7 @@ class WidgetFormInputTextField extends StatefulWidget {
   final bool showLabelOutside;
   final bool autoFocus;
   final bool readOnly;
-  final Function? onChange;
+  final Function(String)? onChange;
   final Function(String)? onFieldSubmitted;
   final String label;
   final String? hintText;
@@ -60,6 +59,9 @@ class _WidgetFormInputTextField extends State<WidgetFormInputTextField> {
   final FocusNode _focus = FocusNode();
   final GlobalKey<FormFieldState> formFieldKey = GlobalKey();
 
+  bool showText = true;
+  bool isError = false;
+
   @override
   void initState() {
     super.initState();
@@ -68,296 +70,157 @@ class _WidgetFormInputTextField extends State<WidgetFormInputTextField> {
 
   @override
   void dispose() {
-    super.dispose();
     _focus.removeListener(_onFocusChange);
     _focus.dispose();
+    super.dispose();
   }
 
   void _onFocusChange() {
     if (!_focus.hasFocus) {
       if (widget.focusChange != null) widget.focusChange!();
-      formFieldKey.currentState!.validate();
+      formFieldKey.currentState?.validate();
     }
   }
 
-  bool showText = true;
-  bool isError = false;
-  
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: widget.showLabelOutside ? null : 68,
-      child: widget.showLabelOutside
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(left: 8),
-                  child: Text(widget.label,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: SystemColors.bluePrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      overflow: TextOverflow.ellipsis),
+      // height: widget.showLabelOutside ? null : 72,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.showLabelOutside)
+          Container(
+            margin: const EdgeInsets.only(left: 8),
+            child: Text(widget.label,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: SystemColors.bluePrimary,
+                  fontWeight: FontWeight.w700,
                 ),
-                TextFormField(
-                  maxLines: widget.maxLines,
-                  key: formFieldKey,
-                  textAlign: widget.textAlign,
-                  enabled: !widget.readOnly,
-                  autofocus: widget.autoFocus,
-                  inputFormatters: widget.inputFormatters,
-                  onFieldSubmitted: widget.onFieldSubmitted,
-                  cursorColor: widget.isDark ? SystemColors.bluePrimary : SystemColors.whiteColor,
-                  controller: widget.controller,
-                  obscureText: (widget.isPassword && showText),
-                  focusNode: _focus,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (String? valor) {
-                    if ((valor == null || valor.isEmpty) && widget.isRequired) {
-                      return "Este campo es requerido ";
-                    }
-
-                    if (widget.validations != null && !_focus.hasFocus) {
-                      var function = widget.validations!;
-                      String? respValid = function(valor);
-                      if (respValid != null) {
-                        return respValid;
-                      }
-                    }
-                    return null;
-                  },
-                  onChanged: (valor) {
-                    setState(() {
-                      isError = (valor.isEmpty);
-                    });
-                    if (widget.onChange != null) {
-                      widget.onChange!(valor);
-                    }
-                  },
-                  style: TextStyle(
-                    color: widget.readOnly
-                        ? SystemColors.grey60
-                        : widget.isDark
-                            ? getTheme(context).primary
-                            : SystemColors.whiteColor,
-                    fontWeight: widget.fontWeight,
-                    fontSize: widget.fontSize,
-                  ),
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    hoverColor: Colors.transparent,
-                    isDense: true,
-                    fillColor: SystemColors.whiteColor,
-                    filled: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 12.0, horizontal: 10.0),
-                    helperText: " ",
-                    floatingLabelBehavior: widget.floatingLabelBehavior,
-                    labelText: widget.showLabelOutside ? null : widget.label,
-                    hintText: widget.hintText,
-                    hintStyle: const TextStyle(color: SystemColors.grey40, fontSize: 14),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: widget.isDark
-                            ? getTheme(context).primary
-                            : SystemColors.whiteColor,
-                        width: 4,
-                      ),
-                    ),
-                    errorStyle: const TextStyle(height: 0.4),
-                    focusedErrorBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: SystemColors.red,
-                        width: 2,
-                      ),
-                    ),
-                    disabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: widget.isDark ? SystemColors.grey40 : SystemColors.whiteColor,
-                        width: 1,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: widget.isDark
-                            ? getTheme(context).primary
-                            : SystemColors.whiteColor,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: widget.isDark ? SystemColors.bluePrimary80 : SystemColors.whiteColor,
-                        width: 2,
-                      ),
-                    ),
-                    errorBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: SystemColors.red,
-                        width: 2,
-                      ),
-                    ),
-                    labelStyle: TextStyle(
-                      color: widget.readOnly
-                          ? SystemColors.grey60
-                          : (_focus.hasFocus ||
-                                  widget.controller.text.isNotEmpty)
-                              ? widget.isDark
-                                  ? getTheme(context).primary
-                                  : SystemColors.whiteColor
-                              : (widget.isDark
-                                  ? getTheme(context).primary
-                                  : SystemColors.whiteColor),
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                overflow: TextOverflow.ellipsis),
+          ),
+          TextFormField(
+            key: formFieldKey,
+            focusNode: _focus,
+            controller: widget.controller,
+            enabled: !widget.readOnly,
+            autofocus: widget.autoFocus,
+            textAlign: widget.textAlign,
+            maxLines: widget.maxLines,
+            inputFormatters: widget.inputFormatters,
+            onFieldSubmitted: widget.onFieldSubmitted,
+            cursorColor: widget.isDark
+                ? SystemColors.bluePrimary
+                : SystemColors.whiteColor,
+            obscureText: (widget.isPassword && showText),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (String? valor) {
+              if ((valor == null || valor.isEmpty) && widget.isRequired) {
+                return "Este campo es requerido";
+              }
+              if (widget.validations != null && !_focus.hasFocus) {
+                return widget.validations!(valor);
+              }
+              return null;
+            },
+            onChanged: widget.onChange,
+            style: TextStyle(
+              color: widget.readOnly
+                  ? SystemColors.grey60
+                  : widget.isDark
+                      ? getTheme(context).primary
+                      : SystemColors.whiteColor,
+              fontWeight: widget.fontWeight,
+              fontSize: widget.fontSize,
+            ),
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hoverColor: Colors.transparent,
+              floatingLabelBehavior: widget.floatingLabelBehavior,
+              labelText: widget.showLabelOutside ? null : widget.label,
+              hintText: widget.hintText,   
+              hintStyle: const TextStyle(color: SystemColors.grey40, fontSize: 14),   
+              border: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: widget.isDark
+                      ? getTheme(context).primary
+                      : SystemColors.whiteColor,
+                  width: 4,
                 ),
-              ],
-            )
-          : TextFormField(
-              key: formFieldKey,
-              textAlign: widget.textAlign,
-              enabled: !widget.readOnly,
-              autofocus: widget.autoFocus,
-              inputFormatters: widget.inputFormatters,
-              onFieldSubmitted: widget.onFieldSubmitted,
-              cursorColor: widget.isDark ? SystemColors.bluePrimary : SystemColors.whiteColor,
-              controller: widget.controller,
-              obscureText: (widget.isPassword && showText),
-              focusNode: _focus,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (String? valor) {
-                if ((valor == null || valor.isEmpty) && widget.isRequired) {
-                  return "Este campo es requerido ";
-                }
-
-                if (widget.validations != null && !_focus.hasFocus) {
-                  var function = widget.validations!;
-                  String? respValid = function(valor);
-                  if (respValid != null) {
-                    return respValid;
-                  }
-                }
-                return null;
-              },
-              onChanged: (valor) {
-                setState(() {
-                  isError = (valor.isEmpty);
-                });
-                if (widget.onChange != null) {
-                  widget.onChange!(valor);
-                }
-              },
-              style: TextStyle(
+              ),
+              errorStyle: const TextStyle(height: 0.4),
+              focusedErrorBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: SystemColors.red,
+                  width: 2,
+                ),
+              ),
+              disabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: widget.isDark
+                      ? SystemColors.grey40
+                      : SystemColors.whiteColor,
+                  width: 1,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: widget.isDark
+                      ? getTheme(context).primary
+                      : SystemColors.whiteColor,
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: widget.isDark
+                      ? SystemColors.bluePrimary80
+                      : SystemColors.whiteColor,
+                  width: 2,
+                ),
+              ),
+              errorBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: SystemColors.red,
+                  width: 2,
+                ),
+              ),
+              labelStyle: TextStyle(
                 color: widget.readOnly
                     ? SystemColors.grey60
-                    : widget.isDark
-                        ? getTheme(context).primary
-                        : SystemColors.whiteColor,
-                fontWeight: widget.fontWeight,
-                fontSize: widget.fontSize,
-              ),
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                floatingLabelBehavior: widget.floatingLabelBehavior,
-                suffixIcon: widget.isPassword
-                    ? GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            showText = !showText;
-                          });
-                        },
-                        child: showText
-                            ? Icon(
-                                Icons.visibility_off,
-                                color: (_focus.hasFocus ||
-                                        widget.controller.text.isNotEmpty)
-                                    ? widget.isDark
-                                        ? getTheme(context).primary
-                                        : SystemColors.whiteColor
-                                    : (widget.isDark
-                                            ? getTheme(context).primary
-                                            : SystemColors.whiteColor)
-                                        .withOpacity(0.6),
-                              )
-                            : Icon(
-                                Icons.visibility,
-                                color: (_focus.hasFocus ||
-                                        widget.controller.text.isNotEmpty)
-                                    ? widget.isDark
-                                        ? getTheme(context).primary
-                                        : SystemColors.whiteColor
-                                    : (widget.isDark
-                                            ? getTheme(context).primary
-                                            : SystemColors.whiteColor)
-                                        .withOpacity(0.6),
-                              ),
-                      )
-                    : widget.suffixIcon,
-                labelText: widget.showLabelOutside ? null : widget.label,
-                hintText: widget.hintText,
-                hintStyle: const TextStyle(color: SystemColors.grey40, fontSize: 14),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: widget.isDark
-                        ? getTheme(context).primary
-                        : SystemColors.whiteColor,
-                    width: 4,
-                  ),
-                ),
-                errorStyle: const TextStyle(height: 0.4),
-                focusedErrorBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: SystemColors.red,
-                    width: 2,
-                  ),
-                ),
-                disabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: widget.isDark ? SystemColors.grey40 : SystemColors.whiteColor,
-                    width: 1,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: widget.isDark
-                        ? getTheme(context).primary
-                        : SystemColors.whiteColor,
-                    width: 1,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: widget.isDark
-                        ? getTheme(context).primary
-                        : SystemColors.whiteColor,
-                    width: 2,
-                  ),
-                ),
-                errorBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: SystemColors.red,
-                    width: 2,
-                  ),
-                ),
-                labelStyle: TextStyle(
-                  color: widget.readOnly
-                      ? SystemColors.grey60
-                      : (_focus.hasFocus || widget.controller.text.isNotEmpty)
-                          ? widget.isDark
-                              ? getTheme(context).primary
-                              : SystemColors.whiteColor
-                          : (widget.isDark
-                              ? getTheme(context).primary
-                              : SystemColors.whiteColor),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+                    : (_focus.hasFocus ||
+                            widget.controller.text.isNotEmpty)
+                        ? widget.isDark
+                            ? getTheme(context).primary
+                            : SystemColors.whiteColor
+                        : (widget.isDark
+                            ? getTheme(context).primary
+                            : SystemColors.whiteColor),
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),      
+              suffixIcon: widget.isPassword
+                ? GestureDetector(
+                  onTap: () {setState(() {showText = !showText;});},
+                  child: Icon(
+                    showText ? Icons.visibility_off : Icons.visibility,
+                    color: (_focus.hasFocus || widget.controller.text.isNotEmpty)
+                      ? widget.isDark ? getTheme(context).primary : SystemColors.whiteColor
+                      : (widget.isDark ? getTheme(context).primary : SystemColors.whiteColor).withOpacity(0.6), 
+                  )
+                ) : widget.suffixIcon,
+              // widget.showLabelOutside
+              helperText: " ",
+              filled: true,
+              fillColor: Colors.transparent,
+              isDense: widget.showLabelOutside ? true : false,
+              contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
             ),
+          )
+        ],
+      ),
     );
   }
+
 }
