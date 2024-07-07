@@ -55,6 +55,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
               decoration: BoxDecoration(
                   color: (getTheme(context).primary),
                   borderRadius: const BorderRadius.all(Radius.circular(15.0))),
+              margin: const EdgeInsets.all(20.0),
               padding: const EdgeInsets.all(50.0),
               child: SingleChildScrollView(
                 child: Column(

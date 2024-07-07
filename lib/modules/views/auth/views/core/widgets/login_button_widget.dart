@@ -23,7 +23,9 @@ class WidgetLoginButton extends StatelessWidget {
       height: 50,
       child: TextButton(
         style: TextButton.styleFrom(
-          backgroundColor: disabled ? SystemColors.grey80.withOpacity(0.6) : SystemColors.grey20,
+          backgroundColor: disabled
+              ? SystemColors.grey80.withOpacity(0.6)
+              : SystemColors.grey20,
           padding: const EdgeInsets.symmetric(horizontal: 20),
         ),
         onPressed: disabled
@@ -38,7 +40,9 @@ class WidgetLoginButton extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  color: disabled ? SystemColors.grey40.withOpacity(0.5) : SystemColors.bluePrimary,
+                  color: disabled
+                      ? SystemColors.grey40.withOpacity(0.5)
+                      : SystemColors.bluePrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
